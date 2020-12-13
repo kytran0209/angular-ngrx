@@ -17,5 +17,18 @@ export class CoursesEffects {
       )
   )
 
+  saveCourse$ = createEffect(
+    () => this.action$
+      .pipe(
+        ofType(CourseActions.courseUpdated),
+        // great for save because it runs the api consequently, the new call is fetched when the previous one is done
+        concatMap(action => this.coursesHttpService.saveCourse(
+          action.update.id,
+          action.update.changes
+        ))
+      ),
+      { dispatch: false }
+  )
+
   constructor(private action$: Actions, private coursesHttpService: CoursesHttpService) {}
 }
