@@ -25,11 +25,10 @@ import { EntityDataService, EntityDefinitionService, EntityMetadataMap} from '@n
 import {compareCourses, Course} from './model/course';
 
 import {compareLessons, Lesson} from './model/lesson';
-import { CoursesResolver } from './courses.resolver';
-import { EffectsModule } from '@ngrx/effects';
-import { CoursesEffects } from './courses.effects';
-import { StoreModule } from '@ngrx/store';
-import { coursesReducer } from './reducers/course.reducers';
+import { CourseEntityService } from './services/course-entity.service';
+import { CourseResolver } from './services/courses.resolver';
+import { CoursesDataService } from './services/courses-data.service';
+import { LessonEntityService } from './services/lesson-entity.service';
 
 
 export const coursesRoutes: Routes = [
@@ -37,16 +36,32 @@ export const coursesRoutes: Routes = [
     path: '',
     component: HomeComponent,
     resolve: {
-      courses: CoursesResolver
+      courses: CourseResolver
     }
-
   },
   {
     path: ':courseUrl',
-    component: CourseComponent
+    component: CourseComponent,
+    resolve: {
+      courses: CourseResolver
+    }
   }
 ];
+// Creating course entity using EntityMetadataMap
+const entityMetadata :EntityMetadataMap = {
+  Course: {
+    sortComparer: compareCourses,
+    entityDispatcherOptions: {
+      // update UI right away when changes without waiting for api calls
+      optimisticUpdate: true
 
+      // optimistic delete is default to true
+    }
+  },
+  Lesson: {
+    sortComparer: compareLessons
+  }
+}
 
 @NgModule({
   imports: [
@@ -66,9 +81,7 @@ export const coursesRoutes: Routes = [
     MatDatepickerModule,
     MatMomentDateModule,
     ReactiveFormsModule,
-    RouterModule.forChild(coursesRoutes),
-    EffectsModule.forFeature([CoursesEffects]),
-    StoreModule.forFeature('courses', coursesReducer)
+    RouterModule.forChild(coursesRoutes)
   ],
   declarations: [
     HomeComponent,
@@ -85,14 +98,21 @@ export const coursesRoutes: Routes = [
   entryComponents: [EditCourseDialogComponent],
   providers: [
     CoursesHttpService,
-    CoursesResolver
+    CourseEntityService,
+    CourseResolver,
+    CoursesDataService,
+    LessonEntityService
   ]
 })
 export class CoursesModule {
+  constructor(
+      private eds: EntityDefinitionService,
+      private entityDataService: EntityDataService,
+      private coursesDataService: CoursesDataService) {
+    // registering metadata map
+    eds.registerMetadataMap(entityMetadata);
 
-  constructor() {
-
+    // register courses data service to change default api url
+    entityDataService.registerService('Course', coursesDataService);
   }
-
-
 }

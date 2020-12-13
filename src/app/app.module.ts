@@ -19,60 +19,59 @@ import {environment} from '../environments/environment';
 import {RouterState, StoreRouterConnectingModule} from '@ngrx/router-store';
 
 import {EffectsModule} from '@ngrx/effects';
-import {EntityDataModule} from '@ngrx/data';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { reducers, metaReducers } from './reducers';
-import { AuthGuard } from './auth/auth.guard';
+import {metaReducers, reducers} from './reducers';
+import {AuthGuard} from './auth/auth.guard';
+import { EntityDataModule } from '@ngrx/data';
 
 
 const routes: Routes = [
-  {
-    path: 'courses',
-    loadChildren: () => import('./courses/courses.module').then(m => m.CoursesModule),
-    canActivate: [AuthGuard]
-  },
-  {
-    path: '**',
-    redirectTo: '/'
-  }
+    {
+        path: 'courses',
+        loadChildren: () => import('./courses/courses.module').then(m => m.CoursesModule),
+        canActivate: [AuthGuard]
+    },
+    {
+        path: '**',
+        redirectTo: '/'
+    }
 ];
 
 
-
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' }),
-    HttpClientModule,
-    MatMenuModule,
-    MatIconModule,
-    MatSidenavModule,
-    MatProgressSpinnerModule,
-    MatListModule,
-    MatToolbarModule,
-    AuthModule.forRoot(),
-    StoreModule.forRoot(reducers, {
-      metaReducers,
-      runtimeChecks: {
-        // Make sure that we can't immute store state
-        strictStateImmutability: true,
-        // Action can't be mutated
-        strictActionImmutability: true,
-        // Ensure our action is serializable
-        strictActionSerializability: true,
-        // Ensure state is serializable
-        strictStateSerializability: true
-      }
-    }),
-    StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
-    EffectsModule.forRoot([]),
-    StoreRouterConnectingModule.forRoot({stateKey: 'router', routerState: RouterState.Minimal})
-  ],
-  bootstrap: [AppComponent]
+    declarations: [
+        AppComponent
+    ],
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' }),
+        HttpClientModule,
+        MatMenuModule,
+        MatIconModule,
+        MatSidenavModule,
+        MatProgressSpinnerModule,
+        MatListModule,
+        MatToolbarModule,
+        AuthModule.forRoot(),
+        StoreModule.forRoot(reducers, {
+            metaReducers,
+            runtimeChecks : {
+                strictStateImmutability: true,
+                strictActionImmutability: true,
+                strictActionSerializability: true,
+                strictStateSerializability:true
+            }
+        }),
+        StoreDevtoolsModule.instrument({maxAge: 25, logOnly: environment.production}),
+        EffectsModule.forRoot([]),
+        StoreRouterConnectingModule.forRoot({
+            stateKey: 'router',
+            routerState: RouterState.Minimal
+        }),
+        EntityDataModule.forRoot({})
+    ],
+    bootstrap: [AppComponent]
 })
 export class AppModule {
 }

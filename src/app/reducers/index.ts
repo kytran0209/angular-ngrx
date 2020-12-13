@@ -1,4 +1,3 @@
-import { routerReducer } from '@ngrx/router-store';
 import {
   ActionReducer,
   ActionReducerMap,
@@ -7,27 +6,29 @@ import {
   MetaReducer
 } from '@ngrx/store';
 import { environment } from '../../environments/environment';
+import {routerReducer} from '@ngrx/router-store';
 
 export interface AppState {
 
 }
 
 export const reducers: ActionReducerMap<AppState> = {
-  // this router reducer is used for time traveling debugging
-  // checkout appmodule StoreRouterConnectingModule
-  router: routerReducer
+    router: routerReducer
 };
 
-export function logger(reducer: ActionReducer<any>): ActionReducer<any> {
-  return (state, action) => {
-    console.log('state before: ', state);
-    console.log('action: ', action);
-    console.log('-----------------------');
+export function logger(reducer:ActionReducer<any>)
+    : ActionReducer<any> {
+    return (state, action) => {
+        console.log("state before: ", state);
+        console.log("action", action);
 
-    return reducer(state, action);
-  };
+        return reducer(state, action);
+    }
+
 }
 
-// metareducer - very similar to module reducer but it's processed before anything else
-export const metaReducers: MetaReducer<AppState>[] = !environment.production ? [logger] : [];
+
+export const metaReducers: MetaReducer<AppState>[] =
+    !environment.production ? [logger] : [];
+
 
